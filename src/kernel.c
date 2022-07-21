@@ -13,7 +13,7 @@
 #define SCREEN_SIZE (VGA_COLS * VGA_ROWS)
 #define INDEX(x, y) ((y * VGA_COLS) + x)
 
-#define TEXT_COLOR (0x0F)
+#define TEXT_COLOR (0x02)
 #define CHAR(c) ((uint16_t) ((TEXT_COLOR << 8) | c))
 
 void clr_terminal();
@@ -37,11 +37,10 @@ void clr_terminal() {
 }
 
 void place_char(uint8_t x, uint8_t y, char c) {
-	vga_buffer[INDEX(x, y)] = CHAR(c);
 	if (INDEX(x_pos, y_pos) >= SCREEN_SIZE) {
-		char *error = "TERMINAL PRINT OUT OF BOUNDS";
-		panic(error);
+		panic("PANIC: TERMINAL CURSOR OUT OF BOUNDS");
 	}
+	vga_buffer[INDEX(x, y)] = CHAR(c);
 }
 
 void print(char *str) {
@@ -51,7 +50,7 @@ void print(char *str) {
 			x_pos = 0;
 			y_pos += 1;
 		} else {
-			vga_buffer[INDEX(x_pos, y_pos)] = CHAR(*term);
+			place_char(x_pos, y_pos, *term);
 			x_pos++;
 			x_pos %= VGA_COLS;
 			if (x_pos == 0) {
